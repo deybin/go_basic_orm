@@ -6,9 +6,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/deybin/go_basic_orm/src/connection"
-	"github.com/deybin/go_basic_orm/src/library/lib"
 )
 
 type Querys struct {
@@ -34,14 +31,14 @@ func (q *Querys) Connect(config Config_Query) *Querys {
 	cloud := config.Cloud
 	var errs error
 	if cloud {
-		q.db, errs = connection.ConnectionCloud()
+		q.db, errs = ConnectionCloud()
 		if errs != nil {
 			q.err = errs
 			fmt.Println("Error SQL:", errs.Error())
 			return q
 		}
 	} else {
-		q.db, errs = connection.Connection(config.Database)
+		q.db, errs = Connection(config.Database)
 		if errs != nil {
 			q.err = errs
 			fmt.Println("Error SQL:", errs.Error())
@@ -81,7 +78,7 @@ func (q *Querys) Select(fields ...string) *Querys {
 func (q *Querys) Where(where string, args ...interface{}) *Querys {
 	q.Query += " WHERE " + where
 	q.Query += args[0].(string)
-	q.Query += lib.InterfaceToString(args[1], true)
+	q.Query += InterfaceToString(args[1], true)
 
 	return q
 }
@@ -90,10 +87,10 @@ func (q *Querys) And(where string, args ...interface{}) *Querys {
 	q.Query += " AND " + where
 	q.Query += args[0].(string)
 	if len(args) <= 2 {
-		q.Query += lib.InterfaceToString(args[1], true)
+		q.Query += InterfaceToString(args[1], true)
 
 	} else {
-		q.Query += lib.InterfaceToString(args[1], args[2].(bool))
+		q.Query += InterfaceToString(args[1], args[2].(bool))
 	}
 	return q
 }
@@ -101,10 +98,10 @@ func (q *Querys) Or(where string, args ...interface{}) *Querys {
 	q.Query += " OR " + where
 	q.Query += args[0].(string)
 	if len(args) <= 2 {
-		q.Query += lib.InterfaceToString(args[1], true)
+		q.Query += InterfaceToString(args[1], true)
 
 	} else {
-		q.Query += lib.InterfaceToString(args[1], args[2].(bool))
+		q.Query += InterfaceToString(args[1], args[2].(bool))
 	}
 
 	return q
@@ -197,7 +194,7 @@ func (q *Querys) Exec(config Config_Query) *Querys {
 	var db *sql.DB
 	if cloud {
 		var errs error
-		db, errs = connection.ConnectionCloud()
+		db, errs = ConnectionCloud()
 		if errs != nil {
 			q.err = errs
 			fmt.Println("Error SQL:", errs.Error())
@@ -206,7 +203,7 @@ func (q *Querys) Exec(config Config_Query) *Querys {
 
 	} else {
 		var errs error
-		db, errs = connection.Connection(config.Database)
+		db, errs = Connection(config.Database)
 		if errs != nil {
 			q.err = errs
 			fmt.Println("Error SQL:", errs.Error())

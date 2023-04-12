@@ -1,4 +1,4 @@
-package connection
+package go_basic_orm
 
 import (
 	"database/sql"

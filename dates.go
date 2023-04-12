@@ -1,4 +1,4 @@
-package date
+package go_basic_orm
 
 import (
 	"fmt"

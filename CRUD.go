@@ -8,12 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/deybin/go_basic_orm/src/connection"
-	"github.com/deybin/go_basic_orm/src/keys"
-	"github.com/deybin/go_basic_orm/src/library/cryptoAes"
-	"github.com/deybin/go_basic_orm/src/library/date"
-	"github.com/deybin/go_basic_orm/src/library/lib"
-	go_basic_orm_models "github.com/deybin/go_basic_orm/src/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -39,10 +33,10 @@ func (sq *SqlExec) New(datos []map[string]interface{}, name string) *SqlExec {
 
 /**
  * Valida los datos para insertar y crea el query para insertar
- * schema {[]go_basic_orm_models.Base}: modelo de la tabla
+ * schema {[]Model}: modelo de la tabla
  * returns {error}: retorna errores ocurridos en la validación
  */
-func (sq *SqlExec) Insert(schema []go_basic_orm_models.Base) error {
+func (sq *SqlExec) Insert(schema []Model) error {
 	data := sq.Ob
 	length := len(data)
 
@@ -95,10 +89,10 @@ func (sq *SqlExec) Insert(schema []go_basic_orm_models.Base) error {
 
 /**
  * Valida los datos para actualizar y crea el query para actualizar
- * schema {[]go_basic_orm_models.Base}: modelo de la tabla
+ * schema {[]Model}: modelo de la tabla
  * returns {error}: retorna errores ocurridos en la validación
  */
-func (sq *SqlExec) Update(schema []go_basic_orm_models.Base) error {
+func (sq *SqlExec) Update(schema []Model) error {
 	data := sq.Ob
 	length := len(data)
 
@@ -186,10 +180,10 @@ func (sq *SqlExec) Update(schema []go_basic_orm_models.Base) error {
 
 /**
  * Valida los datos para Eliminar y crea el query para Eliminar
- * schema {[]go_basic_orm_models.Base}: modelo de la tabla
+ * schema {[]Model}: modelo de la tabla
  * returns {error}: retorna errores ocurridos en la validación
  */
-func (sq *SqlExec) Delete(schema []go_basic_orm_models.Base) error {
+func (sq *SqlExec) Delete(schema []Model) error {
 	data := sq.Ob
 	length := len(data)
 
@@ -246,7 +240,7 @@ func (sq *SqlExec) Delete(schema []go_basic_orm_models.Base) error {
  * returns {error}: retorna errores ocurridos durante la ejecución
  */
 func (sq *SqlExec) Exec(database string, params ...bool) error {
-	cnn, err := connection.Connection(database)
+	cnn, err := Connection(database)
 	if err != nil {
 		return err
 	}
@@ -265,7 +259,7 @@ func (sq *SqlExec) Exec(database string, params ...bool) error {
 		sqlPre := item["sqlPreparate"].(string)
 		if cross {
 			if sq.action == "UPDATE" {
-				sqlPre = lib.Query_Cross_Update(sqlPre)
+				sqlPre = Query_Cross_Update(sqlPre)
 			}
 		}
 		// fmt.Println("PREPARED: ", sqlPre)
@@ -282,7 +276,7 @@ func (sq *SqlExec) Exec(database string, params ...bool) error {
 	return nil
 }
 
-func _checkInsertSchema(schema []go_basic_orm_models.Base, tabla_map map[string]interface{}) (map[string]interface{}, error) {
+func _checkInsertSchema(schema []Model, tabla_map map[string]interface{}) (map[string]interface{}, error) {
 
 	// var err_cont uint64 = 0
 	var err_cont uint
@@ -338,7 +332,7 @@ func _checkInsertSchema(schema []go_basic_orm_models.Base, tabla_map map[string]
 	}
 
 }
-func _checkUpdate(schema []go_basic_orm_models.Base, tabla_map map[string]interface{}) (map[string]interface{}, error) {
+func _checkUpdate(schema []Model, tabla_map map[string]interface{}) (map[string]interface{}, error) {
 	var err_cont uint
 	var error string
 	data := make(map[string]interface{})
@@ -391,7 +385,7 @@ func _checkUpdate(schema []go_basic_orm_models.Base, tabla_map map[string]interf
 	}
 }
 
-func _checkWhere(schema []go_basic_orm_models.Base, table_where map[string]interface{}) (map[string]interface{}, error) {
+func _checkWhere(schema []Model, table_where map[string]interface{}) (map[string]interface{}, error) {
 	var err_cont uint
 	var error string
 	data := make(map[string]interface{})
@@ -425,7 +419,7 @@ func _checkWhere(schema []go_basic_orm_models.Base, table_where map[string]inter
 	}
 }
 
-func caseString(value string, schema go_basic_orm_models.Strings) (string, error) {
+func caseString(value string, schema Strings) (string, error) {
 	err_ := ""
 	value = strings.TrimSpace(value)
 	if schema.Expr != nil {
@@ -435,7 +429,7 @@ func caseString(value string, schema go_basic_orm_models.Strings) (string, error
 		}
 	}
 	if schema.Date {
-		err := date.CheckDate(value)
+		err := CheckDate(value)
 		if err != nil {
 			err_ += fmt.Sprintf("- %s\n", err.Error())
 			return "", errors.New(err_)
@@ -449,7 +443,7 @@ func caseString(value string, schema go_basic_orm_models.Strings) (string, error
 			return value, nil
 		} else {
 			if schema.Cifrar {
-				hash, _ := cryptoAes.AesEncrypt_PHP([]byte(value), keys.GetKey_PrivateCrypto())
+				hash, _ := AesEncrypt_PHP([]byte(value), GetKey_PrivateCrypto())
 				value = hash
 				return value, nil
 			} else {
@@ -481,7 +475,7 @@ func caseString(value string, schema go_basic_orm_models.Strings) (string, error
 	}
 }
 
-func caseFloat(value float64, schema go_basic_orm_models.Floats) (float64, error) {
+func caseFloat(value float64, schema Floats) (float64, error) {
 	error := ""
 	err_cont := 0
 	if schema.Menor != 0 {
@@ -512,7 +506,7 @@ func caseFloat(value float64, schema go_basic_orm_models.Floats) (float64, error
 	}
 
 }
-func caseInt(value int64, schema go_basic_orm_models.Ints) (int64, error) {
+func caseInt(value int64, schema Ints) (int64, error) {
 	error := ""
 	err_cont := 0
 	if !schema.Negativo {
@@ -540,7 +534,7 @@ func caseInt(value int64, schema go_basic_orm_models.Ints) (int64, error) {
 	}
 
 }
-func caseUint(value uint64, schema go_basic_orm_models.Uints) (uint64, error) {
+func caseUint(value uint64, schema Uints) (uint64, error) {
 	if schema.Max > 0 {
 		if value > schema.Max {
 			error := fmt.Sprintf("- No esta en el rango permitido")

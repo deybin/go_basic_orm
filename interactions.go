@@ -1,12 +1,10 @@
-package lib
+package go_basic_orm
 
 import (
 	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
-
-	go_basic_orm_models "github.com/deybin/go_basic_orm/src/models"
 )
 
 func Query_Cross_Update(query string) string {
@@ -51,8 +49,8 @@ func InterfaceToString(params ...interface{}) string {
 	return valueReturn
 }
 
-func SchemaForUpdate(modelo []go_basic_orm_models.Base) []go_basic_orm_models.Base {
-	var newModels []go_basic_orm_models.Base
+func SchemaForUpdate(modelo []Model) []Model {
+	var newModels []Model
 	for _, v := range modelo {
 		if v.Important {
 			newModels = append(newModels, v)
@@ -66,8 +64,8 @@ func SchemaForUpdate(modelo []go_basic_orm_models.Base) []go_basic_orm_models.Ba
 	return newModels
 }
 
-func SchemaForDelete(modelo []go_basic_orm_models.Base) []go_basic_orm_models.Base {
-	var newModels []go_basic_orm_models.Base
+func SchemaForDelete(modelo []Model) []Model {
+	var newModels []Model
 	for _, v := range modelo {
 		if v.Important {
 			newModels = append(newModels, v)

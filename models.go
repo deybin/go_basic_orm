@@ -1,4 +1,4 @@
-package go_basic_orm_models
+package go_basic_orm
 
 import (
 	"regexp"
@@ -29,7 +29,7 @@ type (
 		Min      int64
 		Negativo bool
 	}
-	Base struct {
+	Model struct {
 		Name        string      //:=> (I-U-D) ==> nombre del campo
 		Description string      //:=> (I-U-D) ==> descripción del campo I-U-D
 		Required    bool        //:=> (I)     ==> si el valor del campo es requerido
