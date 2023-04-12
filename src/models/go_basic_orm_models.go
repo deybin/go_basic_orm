@@ -1,4 +1,4 @@
-package models
+package go_basic_orm_models
 
 import (
 	"regexp"

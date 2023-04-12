@@ -13,7 +13,7 @@ import (
 	"github.com/deybin/go_basic_orm/src/library/cryptoAes"
 	"github.com/deybin/go_basic_orm/src/library/date"
 	"github.com/deybin/go_basic_orm/src/library/lib"
-	"github.com/deybin/go_basic_orm/src/models"
+	go_basic_orm_models "github.com/deybin/go_basic_orm/src/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -39,10 +39,10 @@ func (sq *SqlExec) New(datos []map[string]interface{}, name string) *SqlExec {
 
 /**
  * Valida los datos para insertar y crea el query para insertar
- * schema {[]models.Base}: modelo de la tabla
+ * schema {[]go_basic_orm_models.Base}: modelo de la tabla
  * returns {error}: retorna errores ocurridos en la validación
  */
-func (sq *SqlExec) Insert(schema []models.Base) error {
+func (sq *SqlExec) Insert(schema []go_basic_orm_models.Base) error {
 	data := sq.Ob
 	length := len(data)
 
@@ -95,10 +95,10 @@ func (sq *SqlExec) Insert(schema []models.Base) error {
 
 /**
  * Valida los datos para actualizar y crea el query para actualizar
- * schema {[]models.Base}: modelo de la tabla
+ * schema {[]go_basic_orm_models.Base}: modelo de la tabla
  * returns {error}: retorna errores ocurridos en la validación
  */
-func (sq *SqlExec) Update(schema []models.Base) error {
+func (sq *SqlExec) Update(schema []go_basic_orm_models.Base) error {
 	data := sq.Ob
 	length := len(data)
 
@@ -186,10 +186,10 @@ func (sq *SqlExec) Update(schema []models.Base) error {
 
 /**
  * Valida los datos para Eliminar y crea el query para Eliminar
- * schema {[]models.Base}: modelo de la tabla
+ * schema {[]go_basic_orm_models.Base}: modelo de la tabla
  * returns {error}: retorna errores ocurridos en la validación
  */
-func (sq *SqlExec) Delete(schema []models.Base) error {
+func (sq *SqlExec) Delete(schema []go_basic_orm_models.Base) error {
 	data := sq.Ob
 	length := len(data)
 
@@ -282,7 +282,7 @@ func (sq *SqlExec) Exec(database string, params ...bool) error {
 	return nil
 }
 
-func _checkInsertSchema(schema []models.Base, tabla_map map[string]interface{}) (map[string]interface{}, error) {
+func _checkInsertSchema(schema []go_basic_orm_models.Base, tabla_map map[string]interface{}) (map[string]interface{}, error) {
 
 	// var err_cont uint64 = 0
 	var err_cont uint
@@ -338,7 +338,7 @@ func _checkInsertSchema(schema []models.Base, tabla_map map[string]interface{}) 
 	}
 
 }
-func _checkUpdate(schema []models.Base, tabla_map map[string]interface{}) (map[string]interface{}, error) {
+func _checkUpdate(schema []go_basic_orm_models.Base, tabla_map map[string]interface{}) (map[string]interface{}, error) {
 	var err_cont uint
 	var error string
 	data := make(map[string]interface{})
@@ -391,7 +391,7 @@ func _checkUpdate(schema []models.Base, tabla_map map[string]interface{}) (map[s
 	}
 }
 
-func _checkWhere(schema []models.Base, table_where map[string]interface{}) (map[string]interface{}, error) {
+func _checkWhere(schema []go_basic_orm_models.Base, table_where map[string]interface{}) (map[string]interface{}, error) {
 	var err_cont uint
 	var error string
 	data := make(map[string]interface{})
@@ -425,7 +425,7 @@ func _checkWhere(schema []models.Base, table_where map[string]interface{}) (map[
 	}
 }
 
-func caseString(value string, schema models.Strings) (string, error) {
+func caseString(value string, schema go_basic_orm_models.Strings) (string, error) {
 	err_ := ""
 	value = strings.TrimSpace(value)
 	if schema.Expr != nil {
@@ -481,7 +481,7 @@ func caseString(value string, schema models.Strings) (string, error) {
 	}
 }
 
-func caseFloat(value float64, schema models.Floats) (float64, error) {
+func caseFloat(value float64, schema go_basic_orm_models.Floats) (float64, error) {
 	error := ""
 	err_cont := 0
 	if schema.Menor != 0 {
@@ -512,7 +512,7 @@ func caseFloat(value float64, schema models.Floats) (float64, error) {
 	}
 
 }
-func caseInt(value int64, schema models.Ints) (int64, error) {
+func caseInt(value int64, schema go_basic_orm_models.Ints) (int64, error) {
 	error := ""
 	err_cont := 0
 	if !schema.Negativo {
@@ -540,7 +540,7 @@ func caseInt(value int64, schema models.Ints) (int64, error) {
 	}
 
 }
-func caseUint(value uint64, schema models.Uints) (uint64, error) {
+func caseUint(value uint64, schema go_basic_orm_models.Uints) (uint64, error) {
 	if schema.Max > 0 {
 		if value > schema.Max {
 			error := fmt.Sprintf("- No esta en el rango permitido")
