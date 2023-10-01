@@ -48,32 +48,23 @@ func (sq *SqlExec) Insert(schema []Model) error {
 			preArray, err := _checkInsertSchema(schema, item)
 			if err == nil {
 				data_insert = append(data_insert, preArray)
-				var lineSqlExec = make(map[string]interface{}, 2)
-				sqlPreparateInsert := ""
-				sqlPreparateValues := ""
+				var column []string
+				var values []string
 				var i int
-				var p uint64
-				length_newMap := len(preArray)
 				var valuesExec []interface{}
 				char := "$"
 				for k, v := range preArray {
-					p++
-					if i+1 < length_newMap {
-						sqlPreparateInsert += k + ", "
-						sqlPreparateValues += char + strconv.FormatUint(p, 10) + ", "
-					} else {
-						sqlPreparateInsert += k
-						sqlPreparateValues += char + strconv.FormatUint(p, 10)
-					}
-					valuesExec = append(valuesExec, v)
 					i++
+					column = append(column, k)
+					values = append(values, fmt.Sprintf("%s%d", char, i))
+					valuesExec = append(valuesExec, v)
 				}
 
-				sqlPreparate := fmt.Sprintf("INSERT INTO %s (%s) VALUES(%s)", sq.Table, sqlPreparateInsert, sqlPreparateValues)
-				lineSqlExec["sqlPreparate"] = sqlPreparate
-				lineSqlExec["valuesExec"] = valuesExec
-				sqlExec = append(sqlExec, lineSqlExec)
-
+				sqlPreparate := fmt.Sprintf("INSERT INTO %s (%s) VALUES(%s)", sq.Table, strings.Join(column, ", "), strings.Join(values, ", "))
+				sqlExec = append(sqlExec, map[string]interface{}{
+					"sqlPreparate": sqlPreparate,
+					"valuesExec":   values,
+				})
 			} else {
 				return err
 			}
@@ -122,51 +113,35 @@ func (sq *SqlExec) Update(schema []Model) error {
 			}
 
 			data_update = append(data_update, preArray)
-			var lineSqlExec = make(map[string]interface{}, 2)
-			sqlPreparateUpdate := ""
+			var setters []string
+
 			sqlWherePreparateUpdate := ""
-			var i int
-			var p uint64
-			length_newMap := len(preArray)
+			var i uint64
 			var valuesExec []interface{}
 			char := "$"
 			for k, v := range preArray {
-				p++
-
-				if i+1 < length_newMap {
-					sqlPreparateUpdate += k + "= " + char + strconv.FormatUint(p, 10) + ", "
-				} else {
-					sqlPreparateUpdate += k + "= " + char + strconv.FormatUint(p, 10)
-				}
-				valuesExec = append(valuesExec, v)
-
 				i++
+				setters = append(setters, fmt.Sprintf("%s= %s%d", k, char, i))
+				valuesExec = append(valuesExec, v)
 			}
+
 			if length_where > 0 {
 				length_newMapWhere := len(preArray_where)
-				i = 0
-
+				var wheres []string
 				for k, v := range preArray_where {
-					p++
-					if i+1 < length_newMapWhere {
-						// sqlWherePreparateUpdate += fmt.Sprintf("%s = '%s' AND ", ke, va)
-						sqlWherePreparateUpdate += k + " = " + char + strconv.FormatUint(p, 10) + " AND "
-					} else {
-						//sqlWherePreparateUpdate += fmt.Sprintf("%s = '%s'", ke, va)
-						sqlWherePreparateUpdate += k + " = " + char + strconv.FormatUint(p, 10)
-					}
-					valuesExec = append(valuesExec, v)
 					i++
+					wheres = append(wheres, k+" = "+char+strconv.FormatUint(i, 10))
+					valuesExec = append(valuesExec, v)
 				}
 				if length_newMapWhere > 0 {
-					sqlWherePreparateUpdate = "WHERE " + sqlWherePreparateUpdate
+					sqlWherePreparateUpdate = "WHERE " + strings.Join(wheres, " AND ")
 				}
 			}
-			// fmt.Println(sqlPreparateUpdate)
-			sqlPreparate := fmt.Sprintf("UPDATE %s SET %s %s", sq.Table, sqlPreparateUpdate, sqlWherePreparateUpdate)
-			lineSqlExec["sqlPreparate"] = sqlPreparate
-			lineSqlExec["valuesExec"] = valuesExec
-			sqlExec = append(sqlExec, lineSqlExec)
+			sqlPreparate := fmt.Sprintf("UPDATE %s SET %s %s", sq.Table, strings.Join(setters, ", "), sqlWherePreparateUpdate)
+			sqlExec = append(sqlExec, map[string]interface{}{
+				"sqlPreparate": sqlPreparate,
+				"valuesExec":   valuesExec,
+			})
 
 		}
 		sq.Query = sqlExec
@@ -330,8 +305,8 @@ func _checkInsertSchema(schema []Model, tabla_map map[string]interface{}) (map[s
 	} else {
 		return data, nil
 	}
-
 }
+
 func _checkUpdate(schema []Model, tabla_map map[string]interface{}) (map[string]interface{}, error) {
 	var err_cont uint
 	var error string
@@ -504,8 +479,8 @@ func caseFloat(value float64, schema Floats) (float64, error) {
 	} else {
 		return value, nil
 	}
-
 }
+
 func caseInt(value int64, schema Ints) (int64, error) {
 	error := ""
 	err_cont := 0
@@ -532,8 +507,8 @@ func caseInt(value int64, schema Ints) (int64, error) {
 	} else {
 		return value, nil
 	}
-
 }
+
 func caseUint(value uint64, schema Uints) (uint64, error) {
 	if schema.Max > 0 {
 		if value > schema.Max {
