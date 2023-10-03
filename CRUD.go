@@ -63,7 +63,7 @@ func (sq *SqlExec) Insert(schema []Model) error {
 				sqlPreparate := fmt.Sprintf("INSERT INTO %s (%s) VALUES(%s)", sq.Table, strings.Join(column, ", "), strings.Join(values, ", "))
 				sqlExec = append(sqlExec, map[string]interface{}{
 					"sqlPreparate": sqlPreparate,
-					"valuesExec":   values,
+					"valuesExec":   valuesExec,
 				})
 			} else {
 				return err
